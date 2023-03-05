@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "cdm": {
+      "commandName": "Project",
+      "commandLineArgs": "-r -f sortarr.cna"
+    }
+  }
+}
