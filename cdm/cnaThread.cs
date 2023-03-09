@@ -9,6 +9,9 @@ using codium.Compiler.HostModel;
 using codium.Runtime.HostMod;
 using codium.Runtime.ScriptEngine;
 using codium.Runtime.Management;
+using System.Drawing;
+using System.DirectoryServices.ActiveDirectory;
+using System.Diagnostics;
 
 #pragma warning disable CA1416
 namespace cdm
@@ -33,13 +36,16 @@ namespace cdm
             try
             {
                 MainScript = sourcefile;
+
                 Manager = new();
                 Bytecode = new List<String>();
 
                 DefLoader = Manager.Loader;
                 Loader = this;
 
+
                 Manager.Loader = Loader;
+
 
                 StreamReader streamScript = new StreamReader(sourcefile);
                 SourceCode = (streamScript.ReadToEnd());
@@ -48,8 +54,12 @@ namespace cdm
                 HostFunctionPrototype hostFunctionPrototypePrint
                    = new HostFunctionPrototype(null, "print", (Type)null);
                 HostFunctionPrototype gettheline = new HostFunctionPrototype(typeof(string), "getline");
+                HostFunctionPrototype hstForegcolor = new HostFunctionPrototype(null, "forecolor", typeof(int));
+                HostFunctionPrototype hstClear = new HostFunctionPrototype(null, "clear");
                 Manager.RegisterHostFunction(hostFunctionPrototypePrint, this);
                 Manager.RegisterHostFunction(gettheline, this);
+                Manager.RegisterHostFunction(hstClear, this);
+                Manager.RegisterHostFunction(hstForegcolor, this);
             }
             catch (Exception ex)
             {
@@ -112,7 +122,10 @@ namespace cdm
 
             try
             {
+
                 CurScript = new Script(Manager, null);
+
+
                 if (CurScript.Functions.Count == 0)
                 {
                     Console.WriteLine($"[{MainScript}] Script have not Functions defined.");
@@ -168,13 +181,23 @@ namespace cdm
         {
             if (strFunctionName == "print")
             {
-                Console.ForegroundColor = ConsoleColor.Blue;
+                //Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine(listParameters[0]);
-                Console.ForegroundColor = ConsoleColor.White;
+                //Console.ForegroundColor = ConsoleColor.White;
             }
             else if (strFunctionName == "getline")
             {
                 return Console.ReadLine();
+            }
+            else if (strFunctionName == "clear")
+            {
+                Console.Clear();
+            }
+            else if (strFunctionName == "forecolor")
+            {
+                if ((int)listParameters[0] == -1) return (int)Console.ForegroundColor;
+                Console.ForegroundColor = (ConsoleColor)listParameters[0];
+
             }
             return null;
         }
